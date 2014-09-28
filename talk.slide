@@ -90,7 +90,7 @@ Idealizadores:
 
 - Workspace:
     # Escolha um diretorio para ser seu GOPATH
-    export GOPATH="~/workspace/gocode"
+    export GOPATH=~/workspace/gocode
 
 - Crie seus projetos em:
     
