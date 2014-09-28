@@ -1,0 +1,379 @@
+Web em Go, 
+Web Application e Web Services
+
+Guilherme de Bessa Rezende
+Senior DevOps Software Engineer
+Futura Networks (Campus Party)
+
+guilhermebr@gmail.com
+@gbrezende
+http://guilhermebr.com
+http://github.com/guilhermebr
+
+* Agenda
+
+- Go
+- Web Application
+- Web Service
+
+* Go
+
+* Historico
+
+- Iniciado pelo Google em 2007
+- Lançada como Open Source em 2009
+- Versão 1.0 lançada em 2012
+- Atualmente na versão 1.3.2 (09/2014)
+
+* Porquê criar uma nova linguagem?
+
+Combinar os pontos fortes de todas as linguagens.
+
+- Facilidade de programar das linguagens interpretadas e dinamicamente tipadas
+- Eficiencia e Segurança das linguagens compiladas e estaticamente tipadas 
+- Suporte a rede e computação multicore
+- Garbage Collect
+
+* O que é Go?
+Go is a programming language designed by Google to help solve Google's problems, and Google has big problems.
+
+- Compilada - desempenho aproximando C para tarefas de uso intensivo da CPU,
+- Concorrente - Projetado para hardware moderno (multicore, redes),
+- Estaticamente Tipada (mas com sentimento de dinamico)
+- Simples
+- Produtiva
+- Divertida
+- UTF-8
+- Sem ponto e virgula =]
+
+* DNA de Go
+
+Idealizadores:
+
+- Ken Thompson
+ one of the original UNIX developers
+
+- Rob Pike
+ one of the original UTF-8 authors
+
+* Quem usa?
+
+- Google
+- Bitly
+- Heroku
+- Docker
+- Disqus
+- Canonical
+- Github
+- Globo.com
+- Futura Networks =]
+
+.link https://code.google.com/p/go-wiki/wiki/GoUsers
+
+* Começando com Go
+
+.link http://golang.org/doc/install
+
+- Binário ou Código Fonte
+- 32 e 64-bits e Processadores ARM
+- Windows, Mac OS X, Linux e FreeBSD
+
+* Começando com Go
+.link http://play.golang.org/
+.iframe http://play.golang.org/ 500 1000
+
+* Aprendendo Go 
+.link http://tour.golang.org/
+#.iframe http://go-tour-br.appspot.com/ 500 1000
+
+* Ambiente
+
+- Workspace:
+    # Escolha um diretorio para ser seu GOPATH
+    export GOPATH="~/workspace/gocode"
+
+- Crie seus projetos em:
+    
+    $ mkdir $GOPATH/src/github.com/{USUARIO}   # Recomendação
+
+
+* Web Application
+
+.play server.go
+
+* Servindo Arquivos Estaticos
+
+    func main() {
+
+        http.Handle("/img/", http.FileServer(http.Dir("static")))
+        http.Handle("/static/",  http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+        http.HandleFunc("/", handler)
+        fmt.Println("Rodando em 127.0.0.1:8080")
+        http.ListenAndServe(":8080", nil)    
+    }
+
+* Templates
+
+    var templates *template.Template
+
+    func main() {
+        templates = template.Must(template.ParseGlob("views/*.html"))
+        
+        http.Handle("/static/",  http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+        http.HandleFunc("/", handler)
+        fmt.Println("Rodando em 127.0.0.1:8080")
+        http.ListenAndServe(":8080", nil)    
+    }
+
+* Index Handler
+
+    func IndexHandler(w http.ResponseWriter, r *http.Request) {
+
+        var IndexVars struct {
+            Title string
+        }
+
+        IndexVars.Title = "Google DevFest Centro Oeste"
+        err := templates.ExecuteTemplate(w, "index.html", IndexVars)
+
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }   
+    }
+
+* Index.html
+
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>{{.Title}}</title>
+        <script src="static/jquery.min.js" type="text/javascript"></script>
+        <link href="static/css/style.css" rel="stylesheet" >
+
+      </head>
+      <body>
+     
+        <h1>{{.Title}}</h1>
+        <h2> Go Gophers! </h2>
+        <img src="img/gophers.jpg">
+        
+      </body>
+    </html>
+
+* Run, Forrest, Run!
+
+ $ go get github.com/guilhermebr/devfest/webapp
+ $ cd $GOPATH/src/github.com/guilhermebr/devfest/webapp
+ $ go run server.go
+
+
+* Webs Service RESTful
+
+* Web Service
+
+Solução que utilza a internet para integrar diferentes sistemas e para comunicação entre aplicações.
+
+Principais tipos: SOAP ou REST
+
+* Necessidades de um Web Service:
+
+- Sistema de terceiros,
+- Sistema legado,
+- Armazenar dados na nuvem,
+- Sistema multiplataforma (web, desktop, mobile),
+
+* Arquitetura REST
+
+- Cliente-servidor
+- Stateless
+- Hypertex links para referencia de estado
+- URI base (http://example.com/recursos/)
+- Métodos HTTP Padrão (GET, PUT, POST, DELETE, ...)
+- Tipo de dados  (JSON, XML, ...)
+
+* Web Service RESTful
+
+Web Service que utiliza a arquitetura REST
+
+* Web Frameworks
+.link https://github.com/avelino/awesome-go github.com/avelino/awesome-go
+- Beego - is an open-source, high-performance web framework for the Go programming language.
+- Gin - is a web framework written in Go!
+- Goat - A minimalistic REST API server in Go
+- Gorilla - is a web toolkit for the Go programming language.
+- go-relax - A framework of pluggable components to build RESTful API's
+- go-rest - A small and evil REST framework for Go
+- Martini - Martini is a powerful package for quickly writing modular web applications/services in Golang.
+- Revel - A high-productivity web framework for the Go language.
+- web.go - A simple framework to write webapps in Go.
+
+* Gorilla Mux
+
+    import "github.com/gorilla/mux"
+
+    r := mux.NewRouter()
+    r.HandleFunc("/users/", ListUers).Methods("GET")
+    r.HandleFunc("/users/", NewUserHandler).Methods("POST")
+    r.HandleFunc("/users/"+"{id}", GetUser).Methods("GET")
+    r.HandleFunc("/users/"+"{id}", UpdateUser).Methods("PUT")
+
+    http.Handle("/users/", r)
+
+
+* Web Service
+.code webservice.go
+
+* Obtendo Lista de Usuarios
+
+   req: GET /users/
+   res: 200 {"Users": [
+          {"ID": 1, "Nome": "Guilherme", "Sobrenome": "Rezende", "Idade": "28"},
+          {"ID": 2, "Nome": "Alonso", "Sobrenome": "", Idade: "40"}
+        ]}
+
+
+* User
+
+    type User struct {
+        ID  int64
+        Nome string
+        Sobrenome string
+        Idade int
+    }
+
+    type UserManager struct {
+        users  []*User
+        lastID int64
+    }
+
+    func NewUserManager() *UserManager {
+        return &UserManager{}
+    }
+
+    func (m *UserManager) All() []*User {
+        return m.users
+    }
+
+
+
+* ListUsers Handler
+
+    var users = NewUserManager()
+
+    func ListUsers(w http.ResponseWriter, r *http.Request) error {
+        res := users.All()
+        return json.NewEncoder(w).Encode(res)
+    }
+
+* NewUser Handler
+
+    func NewUser(nome string, sobrenome string, idade int) (*User, error) {
+        if nome == "" {
+            return nil, fmt.Errorf("nome obrigatorio")
+        }
+        return &User{0, nome, sobrenome, idade}, nil
+    }
+
+    func NewUserHandler(w http.ResponseWriter, r *http.Request) {
+        req := struct{ Nome string; Sobrenome String; Idade int }{}
+        err := json.NewDecoder(r.Body).Decode(&req)
+        if err != nil {
+            return err
+        }
+        u, err := NewUser(req.nome, req.sobrenome, req.idade)
+        if err != nil {
+            return err
+        }
+        return users.Save(u)
+    }
+
+* UserManager Save
+
+    func (m *UserManager) Save(user *User) error {
+        if user.ID == 0 {
+            m.lastID++
+            user.ID = m.lastID
+            m.users = append(m.users, cloneUser(user))
+            return nil
+        }
+
+        for i, u := range m.users {
+            if u.ID == user.ID {
+                m.users[i] = cloneUser(user)
+                return nil
+            }
+        }
+        return fmt.Errorf("unknown user")
+    }
+
+* CloneUser
+    func cloneUser(u *User) *User {
+        c := *u
+        return &c
+    }
+
+* Keep Running, Forrest!
+
+        $ go get github.com/guilhermebr/devfest/userprofile
+        $ cd $GOPATH/src/github.com/guilhermebr/devfest/userprofile
+        $ go run run.go
+
+        # Em outro terminal:
+
+        $ curl http://localhost:8080/users/
+        $ curl -H "Content-Type: application/json" -d '{"nome":"Guilherme","sobrenome":"Rezende", "idade":28}' http://localhost:8080/users/
+        $ curl http://localhost:8080/users/
+        $ curl -H "Content-Type: application/json" -d '{"nome":"Abdul","sobrenome":"Abdalla", "idade":208}' http://localhost:8080/users/
+        $ curl http://localhost:8080/users/
+        $ curl http://localhost:8080/users/1
+
+
+
+* Ferramentas
+ 
+- go run - Compila e executa o programa
+
+- go build -  Compila pacotes e dependências
+
+- go clean - Apaga objetos gerados
+
+- go get - Faz download e instala pacotes e dependências
+
+- go install - Compila e instala pacotes e dependências
+
+- go test - Testa os pacotes
+
+- go fmt - Formata código
+
+- go doc - Para gerar documentação
+
+* Mais de Go
+
+.link http://www.golangbr.org/ golangbr.org
+- #golangbr - irc.freenode.net =]
+.link http://facebook.com/groups/gogophers facebook.com/groups/gogophers
+.link http://www.casadocodigo.com.br/products/livro-google-go 
+.link http://talks.golang.org/ talks.golang.org
+
+* Android
+
+Go support for Android
+
+David Crawshaw
+June 2014
+
+Abstract
+
+We propose to introduce Go support for the Android platform. The focus will be on supporting games written in Go. The APIs will be those defined in the Android NDK.
+
+* Apresentação e Codigos
+
+.link http://github.com/guilhermebr/devfest
+
+* Venha ser um Gopher!
+
+.image gophers.jpg 450 600
+    - "Marmotas du Goiás"
